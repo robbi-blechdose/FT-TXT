@@ -1,0 +1,76 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.chaquo.python'
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "de.rbgs.ft_txt_app"
+        minSdkVersion 19
+        targetSdkVersion 19
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        versionName "3.3.0"
+        def verParsed = versionName.split(/\./).collect { Integer.parseInt(it) }
+        versionCode ((verParsed[0] * 1000000) + (verParsed[1] * 1000) + (verParsed[2] * 10) + 1)
+
+        python {
+            // If Chaquopy fails to find Python on your build machine, enable and edit the
+            // following line to point to a Python 2.7 or 3.3+ executable.
+            // buildPython "C:/Python27/python.exe"
+
+            // Android UI demo
+            pip {
+                install "Pygments==2.2.0"   // Also used in Java API demo
+            }
+
+            // Python unit tests
+            pip {
+                install "MarkupSafe==1.0"
+                install "certifi==2018.01.18"  // This is in the default extractPackages list.
+            }
+        }
+        ndk {
+            abiFilters "x86", "armeabi-v7a"
+        }
+    }
+
+    flavorDimensions "pyVersion"
+    productFlavors {
+        // Using words rather than numbers so that "three" comes first alphabetically and is
+        // therefore the default (https://issuetracker.google.com/issues/36988145).
+        two {
+            dimension "pyVersion"
+            applicationId "de.rbgs.ft_txt_app"
+            python { version "2.7.15" }
+        }
+        three {
+            dimension "pyVersion"
+            applicationId "de.rbgs.ft_txt_app3"
+            python { version "3.6.5" }
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "demo-${variant.versionName}-${variant.name}.apk"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    //implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'io.github.controlwear:virtualjoystick:1.9.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}
