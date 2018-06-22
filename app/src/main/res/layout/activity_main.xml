@@ -29,7 +29,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_weight="1"
                 android:text="Connect"
-                android:textSize="12sp" />
+                android:textSize="11sp" />
 
             <TextView
                 android:id="@+id/txtInfo"
@@ -174,7 +174,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="35dp"
-        android:text="I1: 0\nI2: 0\nI3: 0\nI4: 0\nI5: 0\nI6:0\nI7: 0\nI8: 0"
+        android:text="I1: 0\nI2: 0\nI3: 0\nI4: 0\nI5: 0\nI6: 0\nI7: 0\nI8: 0"
         android:textColor="#FFFFFF" />
 
 </RelativeLayout>

@@ -35,7 +35,45 @@ public class ButtonListener implements View.OnClickListener
                 o5 = !o5;
                 break;
             }
-            //TODO: O6, O7, O8
+            case R.id.buttonO6:
+            {
+                if(o6)
+                {
+                    main.setOOutoput(6, 0);
+                }
+                else
+                {
+                    main.setOOutoput(6, 512);
+                }
+                o6 = !o6;
+                break;
+            }
+            case R.id.buttonO7:
+            {
+                if(o7)
+                {
+                    main.setOOutoput(7, 0);
+                }
+                else
+                {
+                    main.setOOutoput(7, 512);
+                }
+                o7 = !o7;
+                break;
+            }
+            case R.id.buttonO8:
+            {
+                if(o8)
+                {
+                    main.setOOutoput(8, 0);
+                }
+                else
+                {
+                    main.setOOutoput(8, 512);
+                }
+                o8 = !o8;
+                break;
+            }
             case R.id.sfx26:
             {
                 main.playSound(26);
@@ -63,6 +101,7 @@ public class ButtonListener implements View.OnClickListener
 
                 break;
             }
+            //TODO: Settings
         }
     }
 }

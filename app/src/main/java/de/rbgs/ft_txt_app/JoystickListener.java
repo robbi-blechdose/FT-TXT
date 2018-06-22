@@ -15,17 +15,20 @@ public class JoystickListener implements JoystickView.OnMoveListener
     @Override
     public void onMove(int angle, int strength)
     {
-        int fb = (int) (Math.sin(Math.toRadians(angle)) * strength);
-        int lr = (int) (Math.cos(Math.toRadians(angle)) * strength);
+        if(main.isOnline())
+        {
+            int fb = (int) (Math.sin(Math.toRadians(angle)) * strength);
+            int lr = (int) (Math.cos(Math.toRadians(angle)) * strength);
 
-        int lm = fb + lr;
-        int rm = fb - lr;
+            int lm = fb + lr;
+            int rm = fb - lr;
 
-        lm = map(lm, -100, 100, -512, 512);
-        rm = map(rm, -100, 100, -512, 512);
+            lm = map(lm, -140, 140, -512, 512);
+            rm = map(rm, -140, 140, -512, 512);
 
-        main.setMotorM1Speed(lm);
-        main.setMotorM2Speed(rm);
+            main.setMotorM1Speed(lm);
+            main.setMotorM2Speed(rm);
+        }
     }
 
     private int map(int x, int in_min, int in_max, int out_min, int out_max)

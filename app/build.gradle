@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "de.rbgs.ft_txt_app"
         minSdkVersion 19
-        targetSdkVersion 19
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -38,16 +38,9 @@ android {
 
     flavorDimensions "pyVersion"
     productFlavors {
-        // Using words rather than numbers so that "three" comes first alphabetically and is
-        // therefore the default (https://issuetracker.google.com/issues/36988145).
-        two {
-            dimension "pyVersion"
-            applicationId "de.rbgs.ft_txt_app"
-            python { version "2.7.15" }
-        }
         three {
             dimension "pyVersion"
-            applicationId "de.rbgs.ft_txt_app3"
+            applicationId "de.rbgs.ft_txt_app"
             python { version "3.6.5" }
         }
     }

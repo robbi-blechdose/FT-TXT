@@ -44,13 +44,6 @@ public class Main extends Activity
     private PyObject motorM2;
 
     /**
-    private PyObject outputO5;
-    private PyObject outputO6;
-    private PyObject outputO7;
-    private PyObject outputO8;
-     **/
-
-    /**
      * 0 = Taster
      * 1 = Widerstand
      * 2 = NTC
@@ -59,13 +52,14 @@ public class Main extends Activity
      * 5 = Farbsensor
      */
     public static final int S_BUTTON = 0;
-    public static final int S_RESISTANCE = 1;
+    public static final int S_RESISTOR = 1;
     public static final int S_NTC = 2;
     public static final int S_ULTRASONIC = 3;
     public static final int S_VOLTAGE = 4;
     public static final int S_COLOR = 5;
 
     private int[] sensorTypes;
+    private PyObject[] sensors;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -74,7 +68,15 @@ public class Main extends Activity
         setContentView(R.layout.activity_main);
 
         //Init python
-        Python.start(new AndroidPlatform(this.getApplicationContext()));
+        try
+        {
+            Python.start(new AndroidPlatform(this.getApplicationContext()));
+        }
+        catch(Exception e)
+        {
+            //System.out.println("Python start failed.");
+            //System.out.println(e);
+        }
         python = Python.getInstance();
         ftrobopyModule = python.getModule("ftrobopy");
 
@@ -113,6 +115,7 @@ public class Main extends Activity
 
         sensorTypes = new int[8];
         sensorTypes[0] = S_NTC;
+        sensorTypes[7] = S_ULTRASONIC;
 
         online = false;
 
@@ -133,6 +136,48 @@ public class Main extends Activity
         handler.postDelayed(runnable, 200);
     }
 
+    private void initSensors()
+    {
+        sensors = new PyObject[8];
+
+        for(int i = 0; i < 8; i++)
+        {
+            switch(sensorTypes[i])
+            {
+                case S_BUTTON:
+                {
+                    sensors[i] = ftrobopy.callAttr("input", i + 1);
+                    break;
+                }
+                case S_RESISTOR:
+                case S_NTC:
+                {
+                    sensors[i] = ftrobopy.callAttr("resistor", i + 1);
+                    break;
+                }
+                case S_ULTRASONIC:
+                {
+                    sensors[i] = ftrobopy.callAttr("ultrasonic", i + 1);
+                    break;
+                }
+                case S_VOLTAGE:
+                {
+                    sensors[i] = ftrobopy.callAttr("voltage", i + 1);
+                    break;
+                }
+                case S_COLOR:
+                {
+                    sensors[i] = ftrobopy.callAttr("colorsensor", i + 1);
+                }
+                default:
+                {
+                    sensors[i] = null;
+                    break;
+                }
+            }
+        }
+    }
+
     public void initTXT()
     {
         try
@@ -149,12 +194,7 @@ public class Main extends Activity
             motorM1 = ftrobopy.callAttr("motor", 1);
             motorM2 = ftrobopy.callAttr("motor", 2);
 
-            /**
-            outputO5 = ftrobopy.callAttr("output", 5);
-            outputO6 = ftrobopy.callAttr("output", 6);
-            outputO7 = ftrobopy.callAttr("output", 7);
-            outputO8 = ftrobopy.callAttr("output", 8);
-             **/
+            initSensors();
 
             this.online = true;
         }
@@ -198,13 +238,44 @@ public class Main extends Activity
         {
             switch(sensorTypes[i])
             {
-                //TODO: Rest of cases
-                //NTC
+                case S_BUTTON:
+                {
+                    int s = sensors[i].callAttr("state").toJava(Integer.class);
+                    if(s == 0)
+                    {
+                        s = 1;
+                    }
+                    else
+                    {
+                        s = 0;
+                    }
+
+                    readings += "I" + (i + 1) + ": " + s + "\n";
+                    break;
+                }
+                case S_RESISTOR:
+                {
+                    readings += "I" + (i + 1) + ": " + sensors[i].callAttr("value").toJava(Integer.class) +  " Ohm\n";
+                    break;
+                }
                 case S_NTC:
                 {
-                    int j = i + 1;
-                    readings += "I" + j + ": " + String.format("%.2f", ftrobopy.callAttr("resistor", j).callAttr("ntcTemperature").toJava(Float.class)) +  "\n";
+                    readings += "I" + (i + 1) + ": " + String.format("%.2f", sensors[i].callAttr("ntcTemperature").toJava(Float.class)) +  " °C\n";
                     break;
+                }
+                case S_ULTRASONIC:
+                {
+                    readings += "I" + (i + 1) + ": " + sensors[i].callAttr("distance").toJava(Integer.class) + " cm\n";
+                    break;
+                }
+                case S_VOLTAGE:
+                {
+                    readings += "I" + (i + 1) + ": " + sensors[i].callAttr("voltage").toJava(Integer.class) + " mv\n";
+                    break;
+                }
+                case S_COLOR:
+                {
+                    readings += "I" + (i + 1) + ": " + sensors[i].callAttr("color").toJava(String.class) + "\n";
                 }
                 default:
                 {
@@ -240,10 +311,5 @@ public class Main extends Activity
     public boolean isOnline()
     {
         return online;
-    }
-
-    public void setOnline(boolean o)
-    {
-        this.online = o;
     }
 }
