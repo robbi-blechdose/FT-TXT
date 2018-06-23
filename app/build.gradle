@@ -47,7 +47,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "demo-${variant.versionName}-${variant.name}.apk"
+            outputFileName = "ft-txt-app.apk"//"demo-${variant.versionName}-${variant.name}.apk"
         }
     }
 

@@ -16,6 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".SettingsActivity" android:screenOrientation="landscape" android:parentActivityName=".Main">
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET"/>

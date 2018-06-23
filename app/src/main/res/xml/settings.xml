@@ -5,16 +5,18 @@
         <ListPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:defaultValue="1"
+            android:defaultValue="Joystick"
             android:entries="@array/Controls"
             android:entryValues="@array/Controls"
-            android:key="list_preference_1"
-            android:title="Steuerung Links" />
+            android:key="controlsLeft"
+            android:title="Steuerung Links"/>
         <ListPreference
-            android:defaultValue="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:defaultValue="4 Knöpfe"
             android:entries="@array/Controls"
             android:entryValues="@array/Controls"
-            android:key="list_preference_1"
+            android:key="controlsRight"
             android:title="Steuerung Rechts" />
     </PreferenceCategory>
 </PreferenceScreen>

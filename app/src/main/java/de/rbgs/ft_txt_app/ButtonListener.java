@@ -3,6 +3,9 @@ package de.rbgs.ft_txt_app;
 import android.view.View;
 import android.widget.Button;
 
+/**
+ * @author Robbi Blechdose
+ */
 public class ButtonListener implements View.OnClickListener
 {
     private Main main;
@@ -100,6 +103,10 @@ public class ButtonListener implements View.OnClickListener
                 }
 
                 break;
+            }
+            case R.id.settings:
+            {
+                main.openSettings();
             }
             //TODO: Settings
         }

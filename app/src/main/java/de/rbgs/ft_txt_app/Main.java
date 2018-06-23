@@ -1,14 +1,19 @@
 package de.rbgs.ft_txt_app;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.icu.util.Output;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.chaquo.python.PyObject;
@@ -17,12 +22,31 @@ import com.chaquo.python.android.AndroidPlatform;
 
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 
+/**
+ * FT-TXT-APP
+ *
+ * App for remote-controlling the fischertechnik TXT controller via a smartphone
+ *
+ * Version: 0.2.0
+ *
+ * @author Robbi Blechdose
+ */
 public class Main extends Activity
 {
+    public static final int CONTROLS_JOYSTICK = 0;
+    public static final int CONTROLS_4_BTN = 1;
+    public static final int CONTROLS_4_SLIDERS = 2;
+
     private boolean online = false;
+
+    private int controlsLeft = CONTROLS_JOYSTICK;
+    private int controlsRight = CONTROLS_4_BTN;
+
+    private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
 
     private JoystickView leftJoystick;
 
+    /**
     private Button buttonO5;
     private Button buttonO6;
     private Button buttonO7;
@@ -32,9 +56,11 @@ public class Main extends Activity
 
     private Button connectButton;
     private ImageButton settingsButton;
+     **/
 
     private ButtonListener buttonListener;
     private JoystickListener joystickListener;
+    private SeekbarListener seekbarListener;
 
     private Python python;
     private PyObject ftrobopyModule;
@@ -90,28 +116,50 @@ public class Main extends Activity
         //Buttons
         buttonListener = new ButtonListener(this);
 
-        buttonO5 = findViewById(R.id.buttonO5);
+        Button buttonO5 = findViewById(R.id.buttonO5);
         buttonO5.setOnClickListener(buttonListener);
-        buttonO6 = findViewById(R.id.buttonO6);
+        Button buttonO6 = findViewById(R.id.buttonO6);
         buttonO6.setOnClickListener(buttonListener);
-        buttonO7 = findViewById(R.id.buttonO7);
+        Button  buttonO7 = findViewById(R.id.buttonO7);
         buttonO7.setOnClickListener(buttonListener);
-        buttonO8 = findViewById(R.id.buttonO8);
+        Button buttonO8 = findViewById(R.id.buttonO8);
         buttonO8.setOnClickListener(buttonListener);
 
         //SFX button
-        buttonSFX26 = findViewById(R.id.sfx26);
+        Button buttonSFX26 = findViewById(R.id.sfx26);
         buttonSFX26.setOnClickListener(buttonListener);
 
+        //Sliders
+        seekbarListener = new SeekbarListener(this);
+
+        SeekBar sliderO5 = findViewById(R.id.sliderO5);
+        sliderO5.setOnSeekBarChangeListener(seekbarListener);
+        SeekBar sliderO6 = findViewById(R.id.sliderO6);
+        sliderO6.setOnSeekBarChangeListener(seekbarListener);
+        SeekBar sliderO7 = findViewById(R.id.sliderO7);
+        sliderO7.setOnSeekBarChangeListener(seekbarListener);
+        SeekBar sliderO8 = findViewById(R.id.sliderO8);
+        sliderO8.setOnSeekBarChangeListener(seekbarListener);
+
         //Connect/Disconnect button
-        connectButton = findViewById(R.id.toggleConnect);
+        Button connectButton = findViewById(R.id.toggleConnect);
         connectButton.setOnClickListener(buttonListener);
         //Settings button
-        settingsButton = findViewById(R.id.settings);
+        ImageButton settingsButton = findViewById(R.id.settings);
         settingsButton.setOnClickListener(buttonListener);
-        //Back from settings button
-        //self.backButton = self.findViewById(R.id.back)
-        //self.backButton.setOnClickListener(buttonListener)
+
+        //Load preferences
+        updateControls();
+        //Register preference change listener
+        preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener()
+        {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s)
+            {
+                updateControls();
+            }
+        };
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(preferenceChangeListener);
 
         sensorTypes = new int[8];
         sensorTypes[0] = S_NTC;
@@ -286,6 +334,67 @@ public class Main extends Activity
         }
 
         ((TextView) findViewById(R.id.sensors)).setText(readings);
+    }
+
+    public void openSettings()
+    {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
+    }
+
+    public void updateControls()
+    {
+        String leftControls = null;
+        String rightControls = null;
+
+        try
+        {
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            leftControls = sharedPref.getString(SettingsActivity.KEY_CONTROLS_LEFT, "");
+            rightControls = sharedPref.getString(SettingsActivity.KEY_CONTROLS_RIGHT, "");
+        }
+        catch(Exception e)
+        {
+
+        }
+
+        if(leftControls.equals("Joystick"))
+        {
+            controlsLeft = CONTROLS_JOYSTICK;
+        }
+        else if(leftControls.equals("4 Slider"))
+        {
+            controlsLeft = CONTROLS_4_SLIDERS;
+        }
+        else
+        {
+            controlsLeft = CONTROLS_4_BTN;
+        }
+
+        if(rightControls.equals("Joystick"))
+        {
+            controlsRight = CONTROLS_JOYSTICK;
+        }
+        else if(rightControls.equals("4 Slider"))
+        {
+            controlsRight = CONTROLS_4_SLIDERS;
+        }
+        else
+        {
+            controlsRight = CONTROLS_4_BTN;
+        }
+
+        if(controlsRight == CONTROLS_4_BTN)
+        {
+            findViewById(R.id.buttonsR).setVisibility(View.VISIBLE);
+            findViewById(R.id.slidersR).setVisibility(View.INVISIBLE);
+        }
+        else if(controlsRight == CONTROLS_4_SLIDERS)
+        {
+            findViewById(R.id.buttonsR).setVisibility(View.INVISIBLE);
+            findViewById(R.id.slidersR).setVisibility(View.VISIBLE);
+        }
+        //TODO
     }
 
     public void setMotorM1Speed(int speed)
