@@ -27,7 +27,7 @@ import io.github.controlwear.virtual.joystick.android.JoystickView;
  *
  * App for remote-controlling the fischertechnik TXT controller via a smartphone
  *
- * Version: 0.2.0
+ * Version: 0.4.0
  *
  * @author Robbi Blechdose
  */
@@ -41,22 +41,9 @@ public class Main extends Activity
 
     private int controlsLeft = CONTROLS_JOYSTICK;
     private int controlsRight = CONTROLS_4_BTN;
+    private int soundIndex = 26;
 
     private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
-
-    private JoystickView leftJoystick;
-
-    /**
-    private Button buttonO5;
-    private Button buttonO6;
-    private Button buttonO7;
-    private Button buttonO8;
-
-    private Button buttonSFX26;
-
-    private Button connectButton;
-    private ImageButton settingsButton;
-     **/
 
     private ButtonListener buttonListener;
     private JoystickListener joystickListener;
@@ -110,7 +97,7 @@ public class Main extends Activity
         //Joysticks
         joystickListener = new JoystickListener(this);
 
-        leftJoystick = findViewById(R.id.leftJoystick);
+        JoystickView leftJoystick = findViewById(R.id.leftJoystick);
         leftJoystick.setOnMoveListener(joystickListener);
 
         //Buttons
@@ -126,8 +113,8 @@ public class Main extends Activity
         buttonO8.setOnClickListener(buttonListener);
 
         //SFX button
-        Button buttonSFX26 = findViewById(R.id.sfx26);
-        buttonSFX26.setOnClickListener(buttonListener);
+        Button buttonSFX = findViewById(R.id.sfx);
+        buttonSFX.setOnClickListener(buttonListener);
 
         //Sliders
         seekbarListener = new SeekbarListener(this);
@@ -150,6 +137,7 @@ public class Main extends Activity
 
         //Load preferences
         updateControls();
+        updateSensorTypes();
         //Register preference change listener
         preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener()
         {
@@ -157,13 +145,18 @@ public class Main extends Activity
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s)
             {
                 updateControls();
+                updateSensorTypes();
             }
         };
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(preferenceChangeListener);
 
         sensorTypes = new int[8];
-        sensorTypes[0] = S_NTC;
-        sensorTypes[7] = S_ULTRASONIC;
+        for(int i = 0; i < 8; i++)
+        {
+            sensorTypes[i] = S_BUTTON;
+        }
+        //sensorTypes[0] = S_NTC;
+        //sensorTypes[7] = S_ULTRASONIC;
 
         online = false;
 
@@ -233,7 +226,7 @@ public class Main extends Activity
             ftrobopy = ftrobopyModule.get("ftrobopy").call("auto", 65000, 0.01d, "192.168.2.128");
 
             ((TextView) findViewById(R.id.txtInfo)).setText(
-                    ftrobopy.callAttr("getDevicename").toJava(String.class) + "\nFirmware Version: " +
+                    ftrobopy.callAttr("getDevicename").toJava(String.class) + "\n" + getResources().getString(R.string.firmwareVersion) + ": " +
                             ftrobopy.callAttr("getFirmwareVersion").toJava(String.class).substring(17));
 
             ftrobopy.callAttr("startCameraOnline");
@@ -250,7 +243,7 @@ public class Main extends Activity
         {
             //System.out.println("TXT init failed");
             //System.out.println(e);
-            ((TextView) findViewById(R.id.txtInfo)).setText(e.getMessage());
+            ((TextView) findViewById(R.id.txtInfo)).setText(getResources().getString(R.string.error) + ": " + e.getMessage());
         }
     }
 
@@ -259,6 +252,7 @@ public class Main extends Activity
         ftrobopy.callAttr("stopCameraOnline");
         ftrobopy.callAttr("stopOnline");
         ((ImageView) findViewById(R.id.cameraImage)).setImageResource(R.drawable.ic_launcher_background);
+        ((TextView) findViewById(R.id.txtInfo)).setText(R.string.disconnected);
         this.online = false;
     }
 
@@ -344,57 +338,103 @@ public class Main extends Activity
 
     public void updateControls()
     {
-        String leftControls = null;
-        String rightControls = null;
-
         try
         {
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-            leftControls = sharedPref.getString(SettingsActivity.KEY_CONTROLS_LEFT, "");
-            rightControls = sharedPref.getString(SettingsActivity.KEY_CONTROLS_RIGHT, "");
+            String leftControls = sharedPref.getString(SettingsActivity.KEY_CONTROLS_LEFT, "");
+            String rightControls = sharedPref.getString(SettingsActivity.KEY_CONTROLS_RIGHT, "");
+            String sound = sharedPref.getString(SettingsActivity.KEY_SOUND_INDEX, "");
+
+            if(leftControls.equals(getResources().getString(R.string.joystick)))
+            {
+                controlsLeft = CONTROLS_JOYSTICK;
+                //TODO
+            }
+            else if(leftControls.equals(getResources().getString(R.string.sliders4)))
+            {
+                controlsLeft = CONTROLS_4_SLIDERS;
+                //TODO
+            }
+            else
+            {
+                controlsLeft = CONTROLS_4_BTN;
+                //TODO
+            }
+
+            if(rightControls.equals(getResources().getString(R.string.joystick)))
+            {
+                controlsRight = CONTROLS_JOYSTICK;
+                //TODO
+            }
+            else if(rightControls.equals(getResources().getString(R.string.sliders4)))
+            {
+                controlsRight = CONTROLS_4_SLIDERS;
+                findViewById(R.id.buttonsR).setVisibility(View.INVISIBLE);
+                findViewById(R.id.slidersR).setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                controlsRight = CONTROLS_4_BTN;
+                findViewById(R.id.buttonsR).setVisibility(View.VISIBLE);
+                findViewById(R.id.slidersR).setVisibility(View.INVISIBLE);
+            }
+
+            soundIndex = Integer.parseInt(sound.split(" ")[0]);
+            ((Button) findViewById(R.id.sfx)).setText("" + soundIndex);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+
+    private void updateSensorTypes()
+    {
+        try
+        {
+            String[] types = new String[8];
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            types[0] = sharedPref.getString(SettingsActivity.KEY_TYPE_I1, "");
+            types[1] = sharedPref.getString(SettingsActivity.KEY_TYPE_I2, "");
+            types[2] = sharedPref.getString(SettingsActivity.KEY_TYPE_I3, "");
+            types[3] = sharedPref.getString(SettingsActivity.KEY_TYPE_I4, "");
+            types[4] = sharedPref.getString(SettingsActivity.KEY_TYPE_I5, "");
+            types[5] = sharedPref.getString(SettingsActivity.KEY_TYPE_I6, "");
+            types[6] = sharedPref.getString(SettingsActivity.KEY_TYPE_I7, "");
+            types[7] = sharedPref.getString(SettingsActivity.KEY_TYPE_I8, "");
+
+            for(int i = 0; i < 8; i++)
+            {
+                if(types[i].equals(getResources().getString(R.string.input_digital)))
+                {
+                    sensorTypes[i] = S_BUTTON;
+                }
+                else if(types[i].equals(getResources().getString(R.string.input_resistor)))
+                {
+                    sensorTypes[i] = S_RESISTOR;
+                }
+                else if(types[i].equals(getResources().getString(R.string.input_ntc)))
+                {
+                    sensorTypes[i] = S_NTC;
+                }
+                else if(types[i].equals(getResources().getString(R.string.input_ultrasonic)))
+                {
+                    sensorTypes[i] = S_ULTRASONIC;
+                }
+                else if(types[i].equals(getResources().getString(R.string.input_voltage)))
+                {
+                    sensorTypes[i] = S_VOLTAGE;
+                }
+                else if(types[i].equals(getResources().getString(R.string.input_color)))
+                {
+                    sensorTypes[i] = S_COLOR;
+                }
+            }
         }
         catch(Exception e)
         {
 
         }
-
-        if(leftControls.equals("Joystick"))
-        {
-            controlsLeft = CONTROLS_JOYSTICK;
-        }
-        else if(leftControls.equals("4 Slider"))
-        {
-            controlsLeft = CONTROLS_4_SLIDERS;
-        }
-        else
-        {
-            controlsLeft = CONTROLS_4_BTN;
-        }
-
-        if(rightControls.equals("Joystick"))
-        {
-            controlsRight = CONTROLS_JOYSTICK;
-        }
-        else if(rightControls.equals("4 Slider"))
-        {
-            controlsRight = CONTROLS_4_SLIDERS;
-        }
-        else
-        {
-            controlsRight = CONTROLS_4_BTN;
-        }
-
-        if(controlsRight == CONTROLS_4_BTN)
-        {
-            findViewById(R.id.buttonsR).setVisibility(View.VISIBLE);
-            findViewById(R.id.slidersR).setVisibility(View.INVISIBLE);
-        }
-        else if(controlsRight == CONTROLS_4_SLIDERS)
-        {
-            findViewById(R.id.buttonsR).setVisibility(View.INVISIBLE);
-            findViewById(R.id.slidersR).setVisibility(View.VISIBLE);
-        }
-        //TODO
     }
 
     public void setMotorM1Speed(int speed)
@@ -412,9 +452,9 @@ public class Main extends Activity
         ftrobopy.callAttr("output", output).callAttr("setLevel", value);
     }
 
-    public void playSound(int index)
+    public void playSound()
     {
-        ftrobopy.callAttr("play_sound", index);
+        ftrobopy.callAttr("play_sound", soundIndex);
     }
 
     public boolean isOnline()

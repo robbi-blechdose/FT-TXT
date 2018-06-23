@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">FT-TXT-App</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="controlsLeft">Left Controls</string>
+    <string name="controlsRight">Right Controls</string>
+    <string name="controls">Controls</string>
+    <string name="error">Error</string>
+    <string name="firmwareVersion">Firmware Version</string>
+    <string name="joystick">Joystick</string>
+    <string name="sliders4">4 Sliders</string>
+    <string name="buttons4">4 Buttons</string>
+    <string name="input_digital">Digital</string>
+    <string name="inputs">Inputs</string>
+    <string name="input_resistor">Resistance</string>
+    <string name="input_ntc">NTC</string>
+    <string name="input_ultrasonic">Ultrasonic (Distance)</string>
+    <string name="input_voltage">Voltage</string>
+    <string name="input_color">Color sensor</string>
+    <string name="sound">Sound</string>
 </resources>

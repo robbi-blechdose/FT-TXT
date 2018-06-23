@@ -28,18 +28,18 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_weight="1"
-                android:text="Connect"
-                android:textSize="11sp" />
+                android:text="@string/connect"
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/txtInfo"
-                android:layout_width="469dp"
+                android:layout_width="470dp"
                 android:layout_height="match_parent"
                 android:layout_alignParentTop="true"
                 android:layout_marginEnd="0dp"
                 android:layout_toStartOf="@+id/settings"
                 android:layout_weight="1"
-                android:text="Disconnected\n"
+                android:text="@string/disconnected"
                 android:textAlignment="viewStart"
                 android:textColor="#FFFFFF" />
 
@@ -159,7 +159,7 @@
     </RelativeLayout>
 
     <Button
-        android:id="@+id/sfx26"
+        android:id="@+id/sfx"
         android:layout_width="52dp"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

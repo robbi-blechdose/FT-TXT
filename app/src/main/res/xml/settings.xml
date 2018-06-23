@@ -1,22 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="Steuerung">
+    <PreferenceCategory android:title="@string/controls">
         <ListPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:defaultValue="Joystick"
+            android:defaultValue="@string/joystick"
             android:entries="@array/Controls"
             android:entryValues="@array/Controls"
             android:key="controlsLeft"
-            android:title="Steuerung Links"/>
+            android:title="@string/controlsLeft" />
         <ListPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:defaultValue="4 Knöpfe"
+            android:defaultValue="@string/buttons4"
             android:entries="@array/Controls"
             android:entryValues="@array/Controls"
             android:key="controlsRight"
-            android:title="Steuerung Rechts" />
+            android:title="@string/controlsRight" />
+        <ListPreference
+            android:defaultValue="1 (Flugzeug)"
+            android:entries="@array/Sounds"
+            android:entryValues="@array/Sounds"
+            android:key="sound"
+            android:title="@string/sound" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/inputs">
+        <ListPreference
+            android:defaultValue="@string/input_digital"
+            android:entries="@array/Inputs"
+            android:entryValues="@array/Inputs"
+            android:key="type_i1"
+            android:title="I1" />
+        <ListPreference
+            android:defaultValue="@string/input_digital"
+            android:entries="@array/Inputs"
+            android:entryValues="@array/Inputs"
+            android:key="type_i2"
+            android:title="I2" />
+        <ListPreference
+            android:defaultValue="@string/input_digital"
+            android:entries="@array/Inputs"
+            android:entryValues="@array/Inputs"
+            android:key="type_i3"
+            android:title="I3" />
+        <ListPreference
+            android:defaultValue="@string/input_digital"
+            android:entries="@array/Inputs"
+            android:entryValues="@array/Inputs"
+            android:key="type_i4"
+            android:title="I4" />
+        <ListPreference
+            android:defaultValue="@string/input_digital"
+            android:entries="@array/Inputs"
+            android:entryValues="@array/Inputs"
+            android:key="type_i5"
+            android:title="I5" />
+        <ListPreference
+            android:defaultValue="@string/input_digital"
+            android:entries="@array/Inputs"
+            android:entryValues="@array/Inputs"
+            android:key="type_i6"
+            android:title="I6" />
+        <ListPreference
+            android:defaultValue="@string/input_digital"
+            android:entries="@array/Inputs"
+            android:entryValues="@array/Inputs"
+            android:key="type_i7"
+            android:title="I7" />
+        <ListPreference
+            android:defaultValue="@string/input_digital"
+            android:entries="@array/Inputs"
+            android:entryValues="@array/Inputs"
+            android:key="type_i8"
+            android:title="I8" />
     </PreferenceCategory>
 </PreferenceScreen>

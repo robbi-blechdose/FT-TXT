@@ -1,8 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="Controls">
-        <item>Joystick</item>
-        <item>4 Slider</item>
-        <item>4 Knöpfe</item>
+        <item>@string/joystick</item>
+        <item>@string/sliders4</item>
+        <item>@string/buttons4</item>
+    </string-array>
+    <string-array name="Inputs">
+        <item>@string/input_digital</item>
+        <item>@string/input_resistor</item>
+        <item>@string/input_ntc</item>
+        <item>@string/input_ultrasonic</item>
+        <item>@string/input_voltage</item>
+        <item>@string/input_color</item>
+    </string-array>
+    <string-array name="Sounds">
+        <item>1 (Flugzeug)</item>
+        <item>2 (Alarm)</item>
+        <item>3 (Glocke)</item>
+        <item>4 (Bremsen)</item>
+        <item>5 (Autohupe kurz)</item>
+        <item>6 (Autohupe lang)</item>
+        <item>7 (Brechendes Holz)</item>
+        <item>8 (Bagger)</item>
+        <item>9 (Fantasie 1)</item>
+        <item>10 (Fantasie 2)</item>
+        <item>11 (Fantasie 3)</item>
+        <item>12 (Fantasie 4)</item>
+        <item>13 (Bauernhof)</item>
+        <item>14 (Feuerwehrsirene)</item>
+        <item>15 (Feuerstelle)</item>
+        <item>16 (Formel 1 Auto)</item>
+        <item>17 (Hubschrauber)</item>
+        <item>18 (Hydraulik)</item>
+        <item>19 (Laufender Motor)</item>
+        <item>20 (Startender Motor)</item>
+        <item>21 (Propeller-Flugzeug)</item>
+        <item>22 (Achterbahn)</item>
+        <item>23 (Schiffshorn)</item>
+        <item>24 (Traktor)</item>
+        <item>25 (LKW)</item>
+        <item>26 (Augenzwinkern)</item>
+        <item>27 (Fahrgeräusch)</item>
+        <item>28 (Kopf heben)</item>
+        <item>29 (Kopf neigen)</item>
     </string-array>
 </resources>

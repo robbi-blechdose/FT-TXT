@@ -17,27 +17,30 @@ public class SeekbarListener implements SeekBar.OnSeekBarChangeListener
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b)
     {
-        switch(seekBar.getId())
+        if(main.isOnline())
         {
-            case R.id.sliderO5:
+            switch(seekBar.getId())
             {
-                main.setOOutoput(5, i);
-                break;
-            }
-            case R.id.sliderO6:
-            {
-                main.setOOutoput(6, i);
-                break;
-            }
-            case R.id.sliderO7:
-            {
-                main.setOOutoput(7, i);
-                break;
-            }
-            case R.id.sliderO8:
-            {
-                main.setOOutoput(8, i);
-                break;
+                case R.id.sliderO5:
+                {
+                    main.setOOutoput(5, i);
+                    break;
+                }
+                case R.id.sliderO6:
+                {
+                    main.setOOutoput(6, i);
+                    break;
+                }
+                case R.id.sliderO7:
+                {
+                    main.setOOutoput(7, i);
+                    break;
+                }
+                case R.id.sliderO8:
+                {
+                    main.setOOutoput(8, i);
+                    break;
+                }
             }
         }
     }
