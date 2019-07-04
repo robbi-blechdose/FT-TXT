@@ -57,43 +57,130 @@
             android:id="@+id/cameraImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_alignStart="@+id/background"
             android:src="@drawable/ic_launcher_background" />
     </LinearLayout>
 
-    <io.github.controlwear.virtual.joystick.android.JoystickView xmlns:custom="http://schemas.android.com/apk/res-auto"
+    <io.github.controlwear.virtual.joystick.android.JoystickView
         android:id="@+id/leftJoystick"
         android:layout_width="120dp"
         android:layout_height="264dp"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        custom:JV_backgroundColor="#636363"
-        custom:JV_borderColor="#454545"
-        custom:JV_borderWidth="4dp"
-        custom:JV_buttonColor="#F6F6F6"
-        custom:JV_buttonSizeRatio="15%"
-        custom:JV_fixedCenter="false" />
+        android:layout_alignParentBottom="true"
+        app:JV_backgroundColor="#636363"
+        app:JV_borderColor="#454545"
+        app:JV_borderWidth="4dp"
+        app:JV_buttonColor="#F6F6F6"
+        app:JV_buttonSizeRatio="15%"
+        app:JV_fixedCenter="false" />
+
+    <io.github.controlwear.virtual.joystick.android.JoystickView
+        android:id="@+id/rightJoystick"
+        android:layout_width="120dp"
+        android:layout_height="264dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="609dp"
+        android:layout_marginBottom="1dp"
+        android:visibility="invisible"
+        app:JV_backgroundColor="#636363"
+        app:JV_borderColor="#454545"
+        app:JV_borderWidth="4dp"
+        app:JV_buttonColor="#F6F6F6"
+        app:JV_buttonSizeRatio="15%"
+        app:JV_fixedCenter="false" />
+
+    <RelativeLayout
+        android:id="@+id/buttonsL"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:visibility="invisible">
+
+        <Button
+            android:id="@+id/buttonO1"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/buttonO3"
+            android:layout_marginBottom="0dp"
+            android:text="O1" />
+
+        <Button
+            android:id="@+id/buttonO3"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="0dp"
+            android:text="O3" />
+
+        <Button
+            android:id="@+id/buttonO4"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginBottom="0dp"
+            android:layout_toEndOf="@+id/buttonO1"
+            android:text="O4" />
+
+        <Button
+            android:id="@+id/buttonO2"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/buttonO4"
+            android:layout_marginStart="0dp"
+            android:layout_marginBottom="0dp"
+            android:layout_toEndOf="@+id/buttonO1"
+            android:text="O2" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/slidersL"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible">
+
+        <SeekBar
+            android:id="@+id/sliderO1"
+            android:layout_width="126dp"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/sliderO2"
+            android:layout_marginBottom="0dp"
+            android:max="512"
+            android:progress="0" />
+
+        <SeekBar
+            android:id="@+id/sliderO2"
+            android:layout_width="126dp"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/sliderO3"
+            android:layout_marginBottom="0dp"
+            android:max="512"
+            android:progress="0" />
+
+        <SeekBar
+            android:id="@+id/sliderO3"
+            android:layout_width="126dp"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/sliderO4"
+            android:layout_marginBottom="0dp"
+            android:max="512"
+            android:progress="0" />
+
+        <SeekBar
+            android:id="@+id/sliderO4"
+            android:layout_width="126dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="0dp"
+            android:max="512"
+            android:progress="0" />
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/buttonsR"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible">
-
-        <Button
-            android:id="@+id/buttonO8"
-            android:layout_width="52dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:text="O8" />
-
-        <Button
-            android:id="@+id/buttonO7"
-            android:layout_width="52dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignStart="@+id/buttonO5"
-            android:text="O7" />
 
         <Button
             android:id="@+id/buttonO5"
@@ -110,6 +197,23 @@
             android:layout_above="@+id/buttonO7"
             android:layout_alignParentEnd="true"
             android:text="O6" />
+
+        <Button
+            android:id="@+id/buttonO7"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/buttonO5"
+            android:layout_alignParentBottom="true"
+            android:text="O7" />
+
+        <Button
+            android:id="@+id/buttonO8"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:text="O8" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -156,6 +260,7 @@
             android:layout_alignParentEnd="true"
             android:max="512"
             android:progress="0" />
+
     </RelativeLayout>
 
     <Button
@@ -165,6 +270,14 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:text="26" />
+
+    <ImageButton
+        android:id="@+id/takePhoto"
+        android:layout_width="35dp"
+        android:layout_height="33dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/sensors"
+        android:src="@android:drawable/ic_menu_camera" />
 
     <TextView
         android:id="@+id/sensors"

@@ -1,14 +1,22 @@
 package de.rbgs.ft_txt_app;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.icu.util.Output;
+import android.graphics.Matrix;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -20,6 +28,14 @@ import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 
 /**
@@ -27,7 +43,7 @@ import io.github.controlwear.virtual.joystick.android.JoystickView;
  *
  * App for remote-controlling the fischertechnik TXT controller via a smartphone
  *
- * Version: 0.4.0
+ * Version: 0.5.0
  *
  * @author Robbi Blechdose
  */
@@ -46,7 +62,8 @@ public class Main extends Activity
     private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
 
     private ButtonListener buttonListener;
-    private JoystickListener joystickListener;
+    private LeftJoystickListener leftJoystickListener;
+    private RightJoystickListener rightJoystickListener;
     private SeekbarListener seekbarListener;
 
     private Python python;
@@ -55,6 +72,8 @@ public class Main extends Activity
 
     private PyObject motorM1;
     private PyObject motorM2;
+    private PyObject motorM3;
+    private PyObject motorM4;
 
     /**
      * 0 = Taster
@@ -80,6 +99,15 @@ public class Main extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1)
+        {
+            String[] permissions = {
+                "android.permission.WRITE_EXTERNAL_STORAGE"
+            };
+            int requestCode = 200;
+            requestPermissions(permissions, requestCode);
+        }
+
         //Init python
         try
         {
@@ -95,13 +123,25 @@ public class Main extends Activity
 
         //Init controls
         //Joysticks
-        joystickListener = new JoystickListener(this);
-
+        leftJoystickListener = new LeftJoystickListener(this);
         JoystickView leftJoystick = findViewById(R.id.leftJoystick);
-        leftJoystick.setOnMoveListener(joystickListener);
+        leftJoystick.setOnMoveListener(leftJoystickListener, 200);
+
+        rightJoystickListener = new RightJoystickListener(this);
+        JoystickView rightJoystick = findViewById(R.id.rightJoystick);
+        rightJoystick.setOnMoveListener(rightJoystickListener, 200);
 
         //Buttons
         buttonListener = new ButtonListener(this);
+
+        Button buttonO1 = findViewById(R.id.buttonO1);
+        buttonO1.setOnClickListener(buttonListener);
+        Button buttonO2 = findViewById(R.id.buttonO2);
+        buttonO2.setOnClickListener(buttonListener);
+        Button buttonO3 = findViewById(R.id.buttonO3);
+        buttonO3.setOnClickListener(buttonListener);
+        Button buttonO4 = findViewById(R.id.buttonO4);
+        buttonO4.setOnClickListener(buttonListener);
 
         Button buttonO5 = findViewById(R.id.buttonO5);
         buttonO5.setOnClickListener(buttonListener);
@@ -116,8 +156,20 @@ public class Main extends Activity
         Button buttonSFX = findViewById(R.id.sfx);
         buttonSFX.setOnClickListener(buttonListener);
 
+        ImageButton buttonTakePhoto = findViewById(R.id.takePhoto);
+        buttonTakePhoto.setOnClickListener(buttonListener);
+
         //Sliders
         seekbarListener = new SeekbarListener(this);
+
+        SeekBar sliderO1 = findViewById(R.id.sliderO1);
+        sliderO1.setOnSeekBarChangeListener(seekbarListener);
+        SeekBar sliderO2 = findViewById(R.id.sliderO2);
+        sliderO2.setOnSeekBarChangeListener(seekbarListener);
+        SeekBar sliderO3 = findViewById(R.id.sliderO3);
+        sliderO3.setOnSeekBarChangeListener(seekbarListener);
+        SeekBar sliderO4 = findViewById(R.id.sliderO4);
+        sliderO4.setOnSeekBarChangeListener(seekbarListener);
 
         SeekBar sliderO5 = findViewById(R.id.sliderO5);
         sliderO5.setOnSeekBarChangeListener(seekbarListener);
@@ -135,6 +187,12 @@ public class Main extends Activity
         ImageButton settingsButton = findViewById(R.id.settings);
         settingsButton.setOnClickListener(buttonListener);
 
+        sensorTypes = new int[8];
+        for(int i = 0; i < 8; i++)
+        {
+            sensorTypes[i] = S_BUTTON;
+        }
+
         //Load preferences
         updateControls();
         updateSensorTypes();
@@ -149,14 +207,6 @@ public class Main extends Activity
             }
         };
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(preferenceChangeListener);
-
-        sensorTypes = new int[8];
-        for(int i = 0; i < 8; i++)
-        {
-            sensorTypes[i] = S_BUTTON;
-        }
-        //sensorTypes[0] = S_NTC;
-        //sensorTypes[7] = S_ULTRASONIC;
 
         online = false;
 
@@ -223,17 +273,18 @@ public class Main extends Activity
     {
         try
         {
-            ftrobopy = ftrobopyModule.get("ftrobopy").call("auto", 65000, 0.01d, "192.168.2.128");
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            String ip = sharedPref.getString(SettingsActivity.KEY_IP_ADDRESS, "");
+
+            ftrobopy = ftrobopyModule.get("ftrobopy").call("auto", 65000, 0.01d, ip);
 
             ((TextView) findViewById(R.id.txtInfo)).setText(
                     ftrobopy.callAttr("getDevicename").toJava(String.class) + "\n" + getResources().getString(R.string.firmwareVersion) + ": " +
                             ftrobopy.callAttr("getFirmwareVersion").toJava(String.class).substring(17));
 
-            ftrobopy.callAttr("startCameraOnline");
+            ((Button) findViewById(R.id.toggleConnect)).setText(getResources().getString(R.string.disconnect));
 
-            //Output init
-            motorM1 = ftrobopy.callAttr("motor", 1);
-            motorM2 = ftrobopy.callAttr("motor", 2);
+            ftrobopy.callAttr("startCameraOnline");
 
             initSensors();
 
@@ -253,6 +304,7 @@ public class Main extends Activity
         ftrobopy.callAttr("stopOnline");
         ((ImageView) findViewById(R.id.cameraImage)).setImageResource(R.drawable.ic_launcher_background);
         ((TextView) findViewById(R.id.txtInfo)).setText(R.string.disconnected);
+        ((Button) findViewById(R.id.toggleConnect)).setText(getResources().getString(R.string.connect));
         this.online = false;
     }
 
@@ -272,6 +324,44 @@ public class Main extends Activity
         }
     }
 
+    public void takePhoto()
+    {
+        try
+        {
+            PyObject frame = ftrobopy.callAttr("getCameraFrame");
+            byte[] frameData = python.getBuiltins().callAttr("bytes", frame).toJava(byte[].class);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(frameData, 0, frameData.length);
+
+            saveBitmap(bitmap);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+
+    public void saveBitmap(Bitmap bitmap)
+    {
+        File folder = new File(Environment.getExternalStorageDirectory() + File.separator + "FT-TXT");
+        if(!folder.exists())
+        {
+            folder.mkdirs();
+        }
+
+        try
+        {
+            File f = new File(Environment.getExternalStorageDirectory().toString() + "/FT-TXT/ft-txt-" + (System.currentTimeMillis() / 1000) + ".png");
+            FileOutputStream fOut = new FileOutputStream(f);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+            fOut.flush();
+            fOut.close();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     private void updateSensorReadings()
     {
         String readings = "";
@@ -282,17 +372,7 @@ public class Main extends Activity
             {
                 case S_BUTTON:
                 {
-                    int s = sensors[i].callAttr("state").toJava(Integer.class);
-                    if(s == 0)
-                    {
-                        s = 1;
-                    }
-                    else
-                    {
-                        s = 0;
-                    }
-
-                    readings += "I" + (i + 1) + ": " + s + "\n";
+                    readings += "I" + (i + 1) + ": " + sensors[i].callAttr("state").toJava(Integer.class) + "\n";
                     break;
                 }
                 case S_RESISTOR:
@@ -348,33 +428,43 @@ public class Main extends Activity
             if(leftControls.equals(getResources().getString(R.string.joystick)))
             {
                 controlsLeft = CONTROLS_JOYSTICK;
-                //TODO
+                findViewById(R.id.leftJoystick).setVisibility(View.VISIBLE);
+                findViewById(R.id.buttonsL).setVisibility(View.INVISIBLE);
+                findViewById(R.id.slidersL).setVisibility(View.INVISIBLE);
             }
             else if(leftControls.equals(getResources().getString(R.string.sliders4)))
             {
                 controlsLeft = CONTROLS_4_SLIDERS;
-                //TODO
+                findViewById(R.id.leftJoystick).setVisibility(View.INVISIBLE);
+                findViewById(R.id.buttonsL).setVisibility(View.INVISIBLE);
+                findViewById(R.id.slidersL).setVisibility(View.VISIBLE);
             }
             else
             {
                 controlsLeft = CONTROLS_4_BTN;
-                //TODO
+                findViewById(R.id.leftJoystick).setVisibility(View.INVISIBLE);
+                findViewById(R.id.buttonsL).setVisibility(View.VISIBLE);
+                findViewById(R.id.slidersL).setVisibility(View.INVISIBLE);
             }
 
             if(rightControls.equals(getResources().getString(R.string.joystick)))
             {
                 controlsRight = CONTROLS_JOYSTICK;
-                //TODO
+                findViewById(R.id.rightJoystick).setVisibility(View.VISIBLE);
+                findViewById(R.id.buttonsR).setVisibility(View.INVISIBLE);
+                findViewById(R.id.slidersR).setVisibility(View.INVISIBLE);
             }
             else if(rightControls.equals(getResources().getString(R.string.sliders4)))
             {
                 controlsRight = CONTROLS_4_SLIDERS;
+                findViewById(R.id.rightJoystick).setVisibility(View.INVISIBLE);
                 findViewById(R.id.buttonsR).setVisibility(View.INVISIBLE);
                 findViewById(R.id.slidersR).setVisibility(View.VISIBLE);
             }
             else
             {
                 controlsRight = CONTROLS_4_BTN;
+                findViewById(R.id.rightJoystick).setVisibility(View.INVISIBLE);
                 findViewById(R.id.buttonsR).setVisibility(View.VISIBLE);
                 findViewById(R.id.slidersR).setVisibility(View.INVISIBLE);
             }
@@ -437,14 +527,9 @@ public class Main extends Activity
         }
     }
 
-    public void setMotorM1Speed(int speed)
+    public void setMotorSpeed(int motor, int value)
     {
-        motorM1.callAttr("setSpeed", speed);
-    }
-
-    public void setMotorM2Speed(int speed)
-    {
-        motorM2.callAttr("setSpeed", speed);
+        ftrobopy.callAttr("motor", motor).callAttr("setSpeed", value);
     }
 
     public void setOOutoput(int output, int value)

@@ -9,6 +9,11 @@ import android.widget.Button;
 public class ButtonListener implements View.OnClickListener
 {
     private Main main;
+    private boolean o1 = false;
+    private boolean o2 = false;
+    private boolean o3 = false;
+    private boolean o4 = false;
+
     private boolean o5 = false;
     private boolean o6 = false;
     private boolean o7 = false;
@@ -27,6 +32,58 @@ public class ButtonListener implements View.OnClickListener
         {
             switch(view.getId())
             {
+                case R.id.buttonO1:
+                {
+                    if(o1)
+                    {
+                        main.setOOutoput(1, 0);
+                    }
+                    else
+                    {
+                        main.setOOutoput(1, 512);
+                    }
+                    o1 = !o1;
+                    break;
+                }
+                case R.id.buttonO2:
+                {
+                    if(o2)
+                    {
+                        main.setOOutoput(2, 0);
+                    }
+                    else
+                    {
+                        main.setOOutoput(2, 512);
+                    }
+                    o2 = !o2;
+                    break;
+                }
+                case R.id.buttonO3:
+                {
+                    if(o3)
+                    {
+                        main.setOOutoput(3, 0);
+                    }
+                    else
+                    {
+                        main.setOOutoput(3, 512);
+                    }
+                    o3 = !o3;
+                    break;
+                }
+                case R.id.buttonO4:
+                {
+                    if(o4)
+                    {
+                        main.setOOutoput(4, 0);
+                    }
+                    else
+                    {
+                        main.setOOutoput(4, 512);
+                    }
+                    o4 = !o4;
+                    break;
+                }
                 case R.id.buttonO5:
                 {
                     if(o5)
@@ -84,6 +141,11 @@ public class ButtonListener implements View.OnClickListener
                     main.playSound();
                     break;
                 }
+                case R.id.takePhoto:
+                {
+                    main.takePhoto();
+                    break;
+                }
             }
         }
 
@@ -96,15 +158,6 @@ public class ButtonListener implements View.OnClickListener
             else
             {
                 main.disconnect();
-            }
-
-            if(main.isOnline())
-            {
-                ((Button) view).setText("Disconnect");
-            }
-            else
-            {
-                ((Button) view).setText("Connect");
             }
         }
         else if(view.getId() == R.id.settings)

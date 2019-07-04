@@ -19,4 +19,5 @@
     <string name="input_voltage">Voltage</string>
     <string name="input_color">Color sensor</string>
     <string name="sound">Sound</string>
+    <string name="ipAddress">IP Address</string>
 </resources>

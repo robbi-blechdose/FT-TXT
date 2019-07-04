@@ -2,6 +2,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory android:title="@string/controls">
+        <EditTextPreference
+            android:defaultValue="192.168.2.128"
+            android:key="ipAddress"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/ipAddress" />
         <ListPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -5,13 +5,13 @@ import io.github.controlwear.virtual.joystick.android.JoystickView;
 /**
  * @author Robbi Blechdose
  */
-public class JoystickListener implements JoystickView.OnMoveListener
+public class LeftJoystickListener implements JoystickView.OnMoveListener
 {
     private static final int pivotLimit = 30;
 
     private Main main;
 
-    public JoystickListener(Main main)
+    public LeftJoystickListener(Main main)
     {
         super();
         this.main = main;
@@ -62,14 +62,16 @@ public class JoystickListener implements JoystickView.OnMoveListener
             leftMotor = (1 - pivotScale) * leftMotor + pivotScale * (pivotSpeed);
             rightMotor = (1 - pivotScale) * rightMotor + pivotScale * (-pivotSpeed);
 
-            System.out.println(leftMotor);
-            System.out.println(rightMotor);
+            //System.out.println(leftMotor);
+            //System.out.println(rightMotor);
 
             leftMotor = map(leftMotor, -100, 100, -512, 512);
             rightMotor = map(rightMotor, -100, 100, -512, 512);
 
-            main.setMotorM1Speed(leftMotor);
-            main.setMotorM2Speed(rightMotor);
+            //main.setMotorM1Speed(leftMotor);
+            //main.setMotorM2Speed(rightMotor);
+            main.setMotorSpeed(1, leftMotor);
+            main.setMotorSpeed(2, rightMotor);
         }
     }
 

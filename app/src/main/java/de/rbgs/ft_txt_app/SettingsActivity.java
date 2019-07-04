@@ -9,6 +9,8 @@ import android.view.View;
 
 public class SettingsActivity extends Activity
 {
+    public static final String KEY_IP_ADDRESS = "ipAddress";
+
     public static final String KEY_CONTROLS_LEFT = "controlsLeft";
     public static final String KEY_CONTROLS_RIGHT = "controlsRight";
 

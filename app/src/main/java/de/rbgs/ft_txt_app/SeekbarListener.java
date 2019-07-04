@@ -21,6 +21,26 @@ public class SeekbarListener implements SeekBar.OnSeekBarChangeListener
         {
             switch(seekBar.getId())
             {
+                case R.id.sliderO1:
+                {
+                    main.setOOutoput(1, i);
+                    break;
+                }
+                case R.id.sliderO2:
+                {
+                    main.setOOutoput(2, i);
+                    break;
+                }
+                case R.id.sliderO3:
+                {
+                    main.setOOutoput(3, i);
+                    break;
+                }
+                case R.id.sliderO4:
+                {
+                    main.setOOutoput(4, i);
+                    break;
+                }
                 case R.id.sliderO5:
                 {
                     main.setOOutoput(5, i);
